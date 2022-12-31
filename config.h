@@ -1,0 +1,11 @@
+#ifndef COZY_EXTRUDE_CONFIG_H
+#define COZY_EXTRUDE_CONFIG_H
+
+#define FAN_PWM_FREQ 25000
+#define FAN_PWM_RES 100
+#define FAN_MIN_DC 20
+#define FAN_PWM_PIN 2
+#define FAN_TACH_PIN 15
+#define FAN_RPM_CALC_FREQ 0.5
+
+#endif
