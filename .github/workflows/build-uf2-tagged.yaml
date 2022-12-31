@@ -1,0 +1,60 @@
+name: build and upload release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-uf2:
+    name: build and upload UF2
+    runs-on: ubuntu-latest
+    steps:
+      - name: store tag name
+        id: store_tag
+        run: echo "::set-output name=release_tag::${GITHUB_REF/refs\/tags\//}"
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential libstdc++-arm-none-eabi-newlib git
+      - name: install sdk
+        run: git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/raspberrypi/pico-sdk.git --branch 1.4.0  /opt/pico-sdk
+      - name: build UF2
+        run: (mkdir build && cd build && PICO_SDK_PATH=/opt/pico-sdk cmake .. && make)
+      - name: collect UF2
+        run: mv build/cozy-extrude.uf2 cozy-extrude-${{ steps.store_tag.outputs.release_tag }}.uf2
+      - name: compress UF2
+        run: tar czvf cozy-extrude-${{ steps.store_tag.outputs.release_tag }}.tar.gz cozy-extrude-${{ steps.store_tag.outputs.release_tag }}.uf2
+      - name: create checksums
+        run: sha512sum cozy-extrude-${{ steps.store_tag.outputs.release_tag }}.tar.gz > SHA512SUMS.txt
+      - name: create release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.store_tag.outputs.release_tag }}
+          tag_name: ${{ steps.store_tag.outputs.release_tag }}
+          body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: upload cozy-extrude-xxxxxx.tar.gz
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: cozy-extrude-${{ steps.store_tag.outputs.release_tag }}.tar.gz
+          asset_name: cozy-extrude-${{ steps.store_tag.outputs.release_tag }}.tar.gz
+          asset_content_type: application/gzip
+      - name: upload SHA512SUMS.txt
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: SHA512SUMS.txt
+          asset_name: SHA512SUMS.txt
+          asset_content_type: text/plain
