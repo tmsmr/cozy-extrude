@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <fan.h>
 #include <bme280.h>
-#include "commands.h"
+#include "cmds.h"
 
 #define BME280_SPI_NUM 0
 #define BME280_SPI_SCK 18
@@ -12,6 +12,8 @@
 
 #define FAN_PWM_GPIO 2
 #define FAN_TACH_GPIO 15
+
+#define DEF_TARGET_TEMP 20
 
 int main() {
     stdio_init_all();
@@ -29,23 +31,45 @@ int main() {
             FAN_TACH_GPIO
     );
 
-    uint8_t fan_dc = FAN_MIN_DC;
+    serial_command scmd;
+    int32_t temp;
+    uint8_t fan_dc;
+    uint16_t fan_rpm;
+    volatile uint8_t tgt_temp = DEF_TARGET_TEMP;
 
-    flush_serial_rx();
-    uint8_t cmd[CMD_MAX_LEN];
     while (true) {
-        poll_serial_command(cmd);
-        switch (cmd[0]) {
-            case COMMAND_GET_TEMP:
-                send_dword_response(COMMAND_GET_TEMP, bm280_read_temp(&bme280));
+        poll_next_command(&scmd);
+        switch (scmd.cmd) {
+            case CMD_GET_TEMP:
+                temp = bm280_read_temp(&bme280);
+                scmd.payload_len = 4;
+                scmd.payload[0] = (uint8_t) (temp >> 24);
+                scmd.payload[1] = (uint8_t) (temp >> 16);
+                scmd.payload[2] = (uint8_t) (temp >> 8);
+                scmd.payload[3] = (uint8_t) temp;
+                send_command_response(&scmd);
                 break;
-            case COMMAND_GET_FAN_DC:
-                send_byte_response(COMMAND_GET_FAN_DC, fan_dc);
+            case CMD_GET_FAN_DC:
+                scmd.payload_len = 1;
+                scmd.payload[0] = fan_dc;
+                send_command_response(&scmd);
                 break;
-            case COMMAND_GET_FAN_RPM:
-                send_word_response(COMMAND_GET_FAN_RPM, get_fan_rpm());
+            case CMD_GET_FAN_RPM:
+                fan_rpm = get_fan_rpm();
+                scmd.payload_len = 2;
+                scmd.payload[0] = (uint8_t) (fan_rpm >> 8);
+                scmd.payload[1] = (uint8_t) fan_rpm;
+                send_command_response(&scmd);
                 break;
-            case COMMAND_SET_TGT_TEMP:
+            case CMD_GET_TGT_TEMP:
+                scmd.payload_len = 1;
+                scmd.payload[0] = tgt_temp;
+                send_command_response(&scmd);
+                break;
+            case CMD_SET_TGT_TEMP:
+                tgt_temp = scmd.payload[0];
+                scmd.payload_len = 0;
+                send_command_response(&scmd);
                 break;
             default:
                 break;
