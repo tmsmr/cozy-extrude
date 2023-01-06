@@ -3,7 +3,13 @@
 
 #include "pico/stdlib.h"
 
-void init_fan();
+#define FAN_MIN_DC 20
+
+/*
+ * e.g. init_fan(2, 15);
+ */
+
+void init_fan(uint pwm_gpio, uint tach_gpio);
 
 void set_fan_dc(uint8_t dc);
 
