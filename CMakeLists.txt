@@ -14,6 +14,7 @@ add_subdirectory(lib/bme280)
 
 add_executable(${PROJECT_NAME}
         cozy-extrude.c
+        commands.c commands.h
         )
 
 pico_enable_stdio_usb(${PROJECT_NAME} 0)

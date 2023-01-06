@@ -89,7 +89,7 @@ static int32_t compensate_temp(bme280_t *bme280, uint32_t raw) {
     return T;
 }
 
-float bm280_read_temp(bme280_t *bme280) {
+int32_t bm280_read_temp(bme280_t *bme280) {
     // bst-bme280-ds002.pdf: 4. Data readout
     // -> Data readout is done by starting a burst read from 0xF7 to 0xFC (temperature and pressure)
     uint8_t buf[6];
@@ -99,5 +99,5 @@ float bm280_read_temp(bme280_t *bme280) {
     // -> buf[4] / 0xFB: temp_lsb[7:0], Contains the LSB part ut[11:4] of the raw temperature measurement output data.
     // -> buf[5] / 0xFC: temp_xlsb[3:0], Contains the XLSB part ut[3:0] of the raw temperature measurement output data. Content depend on pressure resolution.
     uint32_t raw = ((uint32_t) buf[3] << 12) | ((uint32_t) buf[4] << 4) | (buf[5] >> 4);
-    return compensate_temp(bme280, raw) / 100.0;
+    return compensate_temp(bme280, raw);
 }

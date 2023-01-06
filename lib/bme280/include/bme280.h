@@ -29,6 +29,6 @@ typedef struct {
 
 bme280_t bme280_init(uint8_t spi_num, uint sck_gpio, uint tx_gpio, uint rx_gpio, uint csn_gpio);
 
-float bm280_read_temp(bme280_t *bme280);
+int32_t bm280_read_temp(bme280_t *bme280);
 
 #endif
