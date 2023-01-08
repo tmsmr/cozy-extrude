@@ -20,14 +20,14 @@ func init() {
 	}
 }
 
-type CozyExtrude struct {
+type CozyExtrudeConn struct {
 	conn      *serial.Port
 	txMu      sync.Mutex
 	responses chan SerialCommand
 }
 
-func NewCozyExtrude() (*CozyExtrude, error) {
-	ce := CozyExtrude{
+func NewCozyExtrudeConn() (*CozyExtrudeConn, error) {
+	ce := CozyExtrudeConn{
 		txMu:      sync.Mutex{},
 		responses: make(chan SerialCommand),
 	}
@@ -38,7 +38,7 @@ func NewCozyExtrude() (*CozyExtrude, error) {
 	return &ce, nil
 }
 
-func (ce *CozyExtrude) Open() error {
+func (ce *CozyExtrudeConn) Open() error {
 	conn, err := serial.OpenPort(&serial.Config{
 		Name: serialEnv.TTYDevice,
 		Baud: int(serialEnv.TTYBaudrate),
@@ -50,19 +50,19 @@ func (ce *CozyExtrude) Open() error {
 	return nil
 }
 
-func (ce *CozyExtrude) Close() {
+func (ce *CozyExtrudeConn) Close() {
 	close(ce.responses)
 	_ = ce.conn.Close()
 }
 
-func (ce *CozyExtrude) StartRxPump() {
+func (ce *CozyExtrudeConn) RxPump() {
 	for {
-		resp := ce.WaitCommandResponse()
+		resp := ce.WaitResponse()
 		ce.responses <- resp
 	}
 }
 
-func (ce *CozyExtrude) WaitCommandResponse() SerialCommand {
+func (ce *CozyExtrudeConn) WaitResponse() SerialCommand {
 	data := make([]byte, 1)
 	var err error
 PollSerialRx:
@@ -108,7 +108,7 @@ PollSerialRx:
 	return cmd
 }
 
-func (ce *CozyExtrude) SendCommand(cmd *SerialCommand) error {
+func (ce *CozyExtrudeConn) SendCommand(cmd *SerialCommand) error {
 	data := make([]byte, 0)
 	data = append(data, SerialCommandPre, cmd.cmd, cmd.payloadLen)
 	checksum := cmd.cmd ^ cmd.payloadLen
