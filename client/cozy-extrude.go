@@ -14,13 +14,15 @@ var cli struct {
 	} `cmd:"set"`
 	Tui struct {
 	} `cmd:"tui"`
+	Serve struct {
+	} `cmd:"serve"`
 }
 
 type statusOutput struct {
-	Temperature       float32 `json:"temperature"`
-	TargetTemperature float32 `json:"targetTemperature"`
-	FanDutyCycle      uint8   `json:"fanDutyCycle"`
-	FanRPM            uint16  `json:"fanRPM"`
+	Temperature  float32 `json:"temperature"`
+	Target       float32 `json:"target"`
+	FanDutyCycle uint8   `json:"fanDutyCycle"`
+	FanRPM       uint16  `json:"fanRPM"`
 }
 
 func fatalOnErr(err error) {
@@ -29,21 +31,35 @@ func fatalOnErr(err error) {
 	}
 }
 
-func printStatus(ce *CozyExtrudeConn) {
-	out := statusOutput{}
+func readStatus(ce *CozyExtrudeConn) (*statusOutput, error) {
+	status := statusOutput{}
 	temp, err := ReqTempBlocking(ce)
-	fatalOnErr(err)
-	out.Temperature = temp
+	if err != nil {
+		return nil, err
+	}
+	status.Temperature = temp
 	tgtTemp, err := ReqTgtTempBlocking(ce)
-	fatalOnErr(err)
-	out.TargetTemperature = tgtTemp
+	if err != nil {
+		return nil, err
+	}
+	status.Target = tgtTemp
 	fanDC, err := ReqFanDCBlocking(ce)
-	fatalOnErr(err)
-	out.FanDutyCycle = fanDC
+	if err != nil {
+		return nil, err
+	}
+	status.FanDutyCycle = fanDC
 	fanRPM, err := ReqFanRPMBlocking(ce)
+	if err != nil {
+		return nil, err
+	}
+	status.FanRPM = fanRPM
+	return &status, nil
+}
+
+func printStatus(ce *CozyExtrudeConn) {
+	status, err := readStatus(ce)
 	fatalOnErr(err)
-	out.FanRPM = fanRPM
-	jsonOut, err := json.MarshalIndent(&out, "", "  ")
+	jsonOut, err := json.MarshalIndent(&status, "", "  ")
 	fatalOnErr(err)
 	println(string(jsonOut))
 }
@@ -66,5 +82,7 @@ func main() {
 		break
 	case "tui":
 		break
+	case "serve":
+		CozyExtrudeHTTP(ce)
 	}
 }
