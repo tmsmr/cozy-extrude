@@ -2,14 +2,13 @@
 #include <stdio.h>
 
 #define SERIAL_TIMEOUT_US 1000
-#define SERIAL_COMMAND_PRE '|'
 
 void poll_next_command(serial_command *cmd) {
     uint8_t i, sum;
     int val;
     retry_serial_rx:
     // wait for preamble
-    while (getchar_timeout_us(SERIAL_TIMEOUT_US) != SERIAL_COMMAND_PRE);
+    while (getchar_timeout_us(0) != SERIAL_COMMAND_PRE);
     // read cmd
     val = getchar_timeout_us(SERIAL_TIMEOUT_US);
     if (val == PICO_ERROR_TIMEOUT) goto retry_serial_rx;

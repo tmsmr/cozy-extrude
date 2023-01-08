@@ -1,6 +1,7 @@
 #ifndef COZY_EXTRUDE_CMDS_H
 #define COZY_EXTRUDE_CMDS_H
 
+#define SERIAL_COMMAND_PRE '|'
 #define CMD_MAX_PAYLOAD_LEN 8
 
 #define CMD_GET_TEMP 0x1A

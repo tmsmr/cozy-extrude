@@ -17,6 +17,8 @@
 
 int main() {
     stdio_init_all();
+    stdio_set_translate_crlf(&stdio_uart, false);
+    stdio_set_translate_crlf(&stdio_usb, false);
 
     bme280_t bme280 = bme280_init(
             BME280_SPI_NUM,
@@ -32,8 +34,8 @@ int main() {
     );
 
     serial_command scmd;
-    int32_t temp;
-    uint8_t fan_dc;
+    int32_t temp = 0;
+    uint8_t fan_dc = 0;
     uint16_t fan_rpm;
     volatile uint8_t tgt_temp = DEF_TARGET_TEMP;
 
