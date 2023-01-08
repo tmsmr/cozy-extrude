@@ -5,6 +5,7 @@ import (
 	"github.com/tarm/serial"
 	"log"
 	"sync"
+	"time"
 )
 
 type SerialEnvSpec struct {
@@ -23,13 +24,13 @@ func init() {
 type CozyExtrudeConn struct {
 	conn      *serial.Port
 	txMu      sync.Mutex
-	responses chan SerialCommand
+	responses chan *SerialCommand
 }
 
 func NewCozyExtrudeConn() (*CozyExtrudeConn, error) {
 	ce := CozyExtrudeConn{
 		txMu:      sync.Mutex{},
-		responses: make(chan SerialCommand),
+		responses: make(chan *SerialCommand),
 	}
 	err := ce.Open()
 	if err != nil {
@@ -62,7 +63,20 @@ func (ce *CozyExtrudeConn) RxPump() {
 	}
 }
 
-func (ce *CozyExtrudeConn) WaitResponse() SerialCommand {
+func (ce *CozyExtrudeConn) WaitResponseWithTimeout(timeout time.Duration) *SerialCommand {
+	resp := make(chan *SerialCommand, 1)
+	go func() {
+		resp <- ce.WaitResponse()
+	}()
+	select {
+	case <-time.After(timeout):
+		return nil
+	case cmd := <-resp:
+		return cmd
+	}
+}
+
+func (ce *CozyExtrudeConn) WaitResponse() *SerialCommand {
 	data := make([]byte, 1)
 	var err error
 PollSerialRx:
@@ -105,7 +119,7 @@ PollSerialRx:
 	if data[0] != checksum {
 		goto PollSerialRx
 	}
-	return cmd
+	return &cmd
 }
 
 func (ce *CozyExtrudeConn) SendCommand(cmd *SerialCommand) error {
