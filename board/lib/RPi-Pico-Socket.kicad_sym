@@ -1,9 +1,9 @@
 (kicad_symbol_lib (version 20211014) (generator kicad_symbol_editor)
   (symbol "RPi-Pico-Socket" (in_bom yes) (on_board yes)
-    (property "Reference" "J" (id 0) (at -2.54 38.1 0)
+    (property "Reference" "J" (id 0) (at -2.54 5.08 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "RPi-Pico-Socket" (id 1) (at 5.08 40.64 0)
+    (property "Value" "RPi-Pico-Socket" (id 1) (at -2.54 2.54 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "" (id 2) (at -5.08 22.86 0)
@@ -11,11 +11,6 @@
     )
     (property "Datasheet" "" (id 3) (at -5.08 22.86 0)
       (effects (font (size 1.27 1.27)) hide)
-    )
-    (symbol "RPi-Pico-Socket_0_0"
-      (text "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf" (at 0 55.88 0)
-        (effects (font (size 1.27 1.27)))
-      )
     )
     (symbol "RPi-Pico-Socket_0_1"
       (rectangle (start -12.7 33.02) (end 12.7 -35.56)
