@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name "RPi-Pico-Socket")(type "KiCad")(uri "${KIPRJMOD}/lib/RPi-Pico-Socket.kicad_sym")(options "")(descr ""))
+  (lib (name "Hongfa-HF46F")(type "KiCad")(uri "${KIPRJMOD}/lib/Hongfa-HF46F.kicad_sym")(options "")(descr ""))
+)
