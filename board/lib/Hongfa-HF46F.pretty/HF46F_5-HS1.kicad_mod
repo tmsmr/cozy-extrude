@@ -24,8 +24,8 @@
   (fp_line (start -1.05 5.75) (end 19.75 5.75) (layer "F.CrtYd") (width 0.12) (tstamp f9fbb595-58a7-46a2-9847-3c2309e292b1))
   (pad "1" thru_hole circle (at 0 0) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask) (tstamp 3d52c190-f174-4c27-8064-f4e92daea770))
   (pad "2" thru_hole circle (at 0 4.7) (size 1.7 1.7) (drill 1) (layers *.Cu *.Mask) (tstamp db406a64-dd43-4336-a06c-ee170a3a9b59))
-  (pad "3" thru_hole circle (at 11.5 4.7) (size 3 3) (drill 1) (layers *.Cu *.Mask) (tstamp c453c871-3a8a-4758-ba70-88e8229311ff))
-  (pad "4" thru_hole circle (at 18.5 4.7) (size 3 3) (drill 1) (layers *.Cu *.Mask) (tstamp ddeb1e69-1765-4d44-bd48-5ba59a9f8efb))
+  (pad "3" thru_hole circle (at 11.5 4.7) (size 2 2) (drill 1) (layers *.Cu *.Mask) (tstamp c453c871-3a8a-4758-ba70-88e8229311ff))
+  (pad "4" thru_hole circle (at 18.5 4.7) (size 2 2) (drill 1) (layers *.Cu *.Mask) (tstamp ddeb1e69-1765-4d44-bd48-5ba59a9f8efb))
   (model "${KIPRJMOD}/lib/HF46F.step"
     (offset (xyz 0 0 0))
     (scale (xyz 1 1 1))
