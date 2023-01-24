@@ -1325,7 +1325,7 @@
     (uuid e81af6a5-45c6-4d18-ac2c-2f6d6836f747)
     (property "Reference" "K1" (id 0) (at 178.435 103.505 90))
     (property "Value" "HF46F_5-HS1" (id 1) (at 179.07 106.045 90))
-    (property "Footprint" "Hongfa-HF46F:HF46F_5-HS1" (id 2) (at 190.5 97.79 0)
+    (property "Footprint" "Hongfa-HF46F:HF46F" (id 2) (at 190.5 97.79 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "" (id 3) (at 190.5 97.79 0)
@@ -1412,7 +1412,7 @@
       (reference "J4") (unit 1) (value "Heater-Switch") (footprint "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal")
     )
     (path "/e81af6a5-45c6-4d18-ac2c-2f6d6836f747"
-      (reference "K1") (unit 1) (value "HF46F_5-HS1") (footprint "Hongfa-HF46F:HF46F_5-HS1")
+      (reference "K1") (unit 1) (value "HF46F_5-HS1") (footprint "Hongfa-HF46F:HF46F")
     )
     (path "/a47ea3c8-3841-47fd-a5b3-6e9dc298f59d"
       (reference "R1") (unit 1) (value "TACH-Pullup") (footprint "Resistor_THT:R_Axial_DIN0309_L9.0mm_D3.2mm_P15.24mm_Horizontal")
