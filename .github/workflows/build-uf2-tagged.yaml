@@ -9,6 +9,7 @@ jobs:
   build-uf2:
     name: build and upload UF2
     runs-on: ubuntu-latest
+    working-directory: firmware
     steps:
       - name: store tag name
         id: store_tag
@@ -37,7 +38,7 @@ jobs:
           prerelease: false
           release_name: ${{ steps.store_tag.outputs.release_tag }}
           tag_name: ${{ steps.store_tag.outputs.release_tag }}
-          body_path: CHANGELOG.md
+          body_path: ../CHANGELOG.md
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: upload cozy-extrude-xxxxxx.tar.gz
