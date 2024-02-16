@@ -15,7 +15,7 @@
 
 #define READ_TEMP_DELAY_MS 10
 
-#define DEF_TARGET_TEMP 2000
+#define DEF_TARGET_TEMP 3500
 #define FAN_CTRL_DELAY_MS 100
 
 volatile int32_t temp = 0;
