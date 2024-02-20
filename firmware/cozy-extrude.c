@@ -121,6 +121,8 @@ int main() {
                 break;
             case CMD_ENABLE_HEATING:
                 heating_enabled = scmd.payload[0] > 0;
+                scmd.payload_len = 0;
+                send_command_response(&scmd);
                 break;
             case CMD_GET_HEATING:
                 scmd.payload_len = 1;
