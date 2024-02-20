@@ -10,11 +10,11 @@ var cli struct {
 	Status struct {
 	} `cmd:"status"`
 	Set struct {
-		Temp uint16 `arg`
+		Temp uint16 `arg:""`
 	} `cmd:"set"`
 	Heating struct {
-		Enable bool `arg`
-	} `cmd:"set"`
+		Enable uint8 `arg:""`
+	} `cmd:"heating"`
 	Tui struct {
 	} `cmd:"tui"`
 	Serve struct {
@@ -89,8 +89,8 @@ func main() {
 	case "set <temp>":
 		fatalOnErr(ReqSetTgtTempBlocking(ce, cli.Set.Temp*100))
 		break
-	case "heating <enabled>":
-		fatalOnErr(ReqEnableHeatingBlocking(ce, cli.Heating.Enable))
+	case "heating <enable>":
+		fatalOnErr(ReqEnableHeatingBlocking(ce, cli.Heating.Enable > 0))
 		break
 	case "serve":
 		CozyExtrudeHTTP(ce)
