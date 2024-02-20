@@ -3,6 +3,7 @@
 #include <fan.h>
 #include <bme280.h>
 #include "cmds.h"
+#include "heater.h"
 
 #define BME280_SPI_NUM 0
 #define BME280_SPI_SCK 18
@@ -15,15 +16,19 @@
 
 #define READ_TEMP_DELAY_MS 10
 
-#define DEF_TARGET_TEMP 2000
+#define DEF_TARGET_TEMP 3000
 #define FAN_CTRL_DELAY_MS 100
+#define HEATER_CTRL_DELAY_MS 5000
 
 volatile int32_t temp = 0;
 volatile int32_t tgt_temp = DEF_TARGET_TEMP;
 volatile uint8_t fan_dc = 0;
+volatile bool heating_enabled = false;
+volatile bool heating = false;
 
 struct repeating_timer _read_temp_rt;
 struct repeating_timer _ctrl_fan_dc_rt;
+struct repeating_timer _ctrl_heater_rt;
 
 bme280_t bme280;
 
@@ -38,6 +43,12 @@ bool _ctrl_fan_dc_isr(struct repeating_timer *_1) {
     if (dc > 100) dc = 100;
     set_fan_dc(dc);
     fan_dc = dc;
+    return true;
+}
+
+bool _ctrl_heater_isr(struct repeating_timer *_1) {
+    heating = (temp < tgt_temp) && heating_enabled;
+    set_heating(heating);
     return true;
 }
 
@@ -59,12 +70,14 @@ int main() {
             FAN_TACH_GPIO
     );
 
+    init_heater();
+
     add_repeating_timer_ms(-READ_TEMP_DELAY_MS, _read_temp_isr, NULL, &_read_temp_rt);
     add_repeating_timer_ms(-FAN_CTRL_DELAY_MS, _ctrl_fan_dc_isr, NULL, &_ctrl_fan_dc_rt);
+    add_repeating_timer_ms(-HEATER_CTRL_DELAY_MS, _ctrl_heater_isr, NULL, &_ctrl_heater_rt);
 
     serial_command scmd;
     uint16_t fan_rpm;
-    int32_t rq_temp;
 
     while (true) {
         poll_next_command(&scmd);
@@ -104,6 +117,16 @@ int main() {
                         | (scmd.payload[2] << 8)
                         | scmd.payload[3];
                 scmd.payload_len = 0;
+                send_command_response(&scmd);
+                break;
+            case CMD_ENABLE_HEATING:
+                heating_enabled = scmd.payload[0] > 0;
+                scmd.payload_len = 0;
+                send_command_response(&scmd);
+                break;
+            case CMD_GET_HEATING:
+                scmd.payload_len = 1;
+                scmd.payload[0] = heating;
                 send_command_response(&scmd);
                 break;
             default:

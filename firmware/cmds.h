@@ -9,6 +9,8 @@
 #define CMD_GET_FAN_RPM 0x3A
 #define CMD_GET_TGT_TEMP 0x4A
 #define CMD_SET_TGT_TEMP 0x5A
+#define CMD_ENABLE_HEATING 0x6A
+#define CMD_GET_HEATING 0x7A
 
 #include "pico/stdlib.h"
 
