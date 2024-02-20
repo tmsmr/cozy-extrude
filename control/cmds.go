@@ -10,11 +10,13 @@ const (
 	SerialCommandPre = '|'
 	CmdMaxPayloadLen = 8
 
-	CmdGetTemp    = 0x1A
-	CmdGetFanDc   = 0x2A
-	CmdGetFanRpm  = 0x3A
-	CmdGetTgtTemp = 0x4A
-	CmdSetTgtTemp = 0x5A
+	CmdGetTemp       = 0x1A
+	CmdGetFanDc      = 0x2A
+	CmdGetFanRpm     = 0x3A
+	CmdGetTgtTemp    = 0x4A
+	CmdSetTgtTemp    = 0x5A
+	CmdEnableHeating = 0x6A
+	CmdGetHeating    = 0x7A
 
 	CmdResponseTimeout = 10 * time.Millisecond
 )
@@ -107,4 +109,40 @@ func ReqSetTgtTempBlocking(ce *CozyExtrudeConn, tgtTemp uint16) error {
 		return ErrCmdTimout
 	}
 	return nil
+}
+
+func ReqEnableHeatingBlocking(ce *CozyExtrudeConn, enable bool) error {
+	cmd := SerialCommand{
+		cmd:        CmdEnableHeating,
+		payloadLen: 1,
+		payload:    [8]byte{},
+	}
+	var enableByte byte = 0
+	if enable {
+		enableByte = 1
+	}
+	cmd.payload[0] = enableByte
+	if ce.SendCommand(&cmd) != nil {
+		return ErrCmdSend
+	}
+	resp := ce.WaitResponseWithTimeout(CmdResponseTimeout)
+	if resp == nil {
+		return ErrCmdTimout
+	}
+	return nil
+}
+
+func ReqHeatingBlocking(ce *CozyExtrudeConn) (bool, error) {
+	if (ce.SendCommand(&SerialCommand{
+		cmd:        CmdGetHeating,
+		payloadLen: 0,
+		payload:    [8]byte{},
+	}) != nil) {
+		return false, ErrCmdSend
+	}
+	resp := ce.WaitResponseWithTimeout(CmdResponseTimeout)
+	if resp == nil {
+		return false, ErrCmdTimout
+	}
+	return resp.payload[0] > 0, nil
 }

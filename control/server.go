@@ -49,5 +49,22 @@ func CozyExtrudeHTTP(ce *CozyExtrudeConn) {
 		}
 	})
 
+	r.POST("/api/heating/:enable", func(c *gin.Context) {
+		enable, err := strconv.Atoi(c.Param("enable"))
+		if err != nil {
+			c.AbortWithError(http.StatusUnprocessableEntity, err)
+			return
+		}
+		if enable < 0 || enable > 1 {
+			c.AbortWithError(http.StatusUnprocessableEntity, err)
+			return
+		}
+		err = ReqEnableHeatingBlocking(ce, enable > 0)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	})
+
 	r.Run(serverEnv.HTTPBindAddress)
 }

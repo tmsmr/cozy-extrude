@@ -12,6 +12,9 @@ var cli struct {
 	Set struct {
 		Temp uint16 `arg`
 	} `cmd:"set"`
+	Heating struct {
+		Enable bool `arg`
+	} `cmd:"set"`
 	Tui struct {
 	} `cmd:"tui"`
 	Serve struct {
@@ -23,6 +26,7 @@ type statusOutput struct {
 	Target       float32 `json:"target"`
 	FanDutyCycle uint8   `json:"fanDutyCycle"`
 	FanRPM       uint16  `json:"fanRPM"`
+	Heating      bool    `json:"heating"`
 }
 
 func fatalOnErr(err error) {
@@ -53,6 +57,11 @@ func readStatus(ce *CozyExtrudeConn) (*statusOutput, error) {
 		return nil, err
 	}
 	status.FanRPM = fanRPM
+	heating, err := ReqHeatingBlocking(ce)
+	if err != nil {
+		return nil, err
+	}
+	status.Heating = heating
 	return &status, nil
 }
 
@@ -80,7 +89,8 @@ func main() {
 	case "set <temp>":
 		fatalOnErr(ReqSetTgtTempBlocking(ce, cli.Set.Temp*100))
 		break
-	case "tui":
+	case "heating <enabled>":
+		fatalOnErr(ReqEnableHeatingBlocking(ce, cli.Heating.Enable))
 		break
 	case "serve":
 		CozyExtrudeHTTP(ce)
